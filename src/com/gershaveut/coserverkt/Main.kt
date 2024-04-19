@@ -1,5 +1,11 @@
 package com.gershaveut.coserverkt
 
-fun main() {
-    println("Hello World!")
+suspend fun main() {
+    try {
+        println("Enter port")
+        
+        COServer(readln().toInt()).start()
+    } catch (_: Exception) {
+        main()
+    }
 }
