@@ -24,14 +24,17 @@ class COServer(port: Int) {
 		while (!serverSocket.isClosed) {
 			try {
 				val clientSocket = serverSocket.accept()
-                
                 val client = COClient(BufferedReader(InputStreamReader(clientSocket.getInputStream())).readLine(), clientSocket, this@COServer)
-                
-                clients.add(client)
 				
+				if (clients.any { it.name == client.name })
+					client.disconnect("User ${client.name} is already joined")
+				
+				//Registering
 				clients.forEach {
 					client.sendMessage(Message(it.name, MessageType.Join))
 				}
+				
+				clients.add(client)
 				
 				broadcast(Message(client.name, MessageType.Join))
 				broadcast(Message("${client.name} connected"))
@@ -59,8 +62,6 @@ class COServer(port: Int) {
 			else
 				it.sendMessage(message)
         }
-		
-		println(message)
     }
 	
 	fun executeCommand(message: Message) : Message? {
@@ -77,7 +78,10 @@ class COServer(port: Int) {
 				
 				client.disconnect(reason)
 				
-				println("$client.name excluded due to $reason")
+				if (reason.isEmpty())
+					println("${client.name} excluded without a reason")
+				else
+					println("${client.name} excluded due to $reason")
 			}
 			else -> broadcast(message)
 		}

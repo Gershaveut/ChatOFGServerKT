@@ -9,7 +9,7 @@ import java.io.PrintWriter
 import java.net.Socket
 
 class COClient(val name: String, val socket: Socket, val coServer: COServer) {
-	var admin: Boolean = false
+	var admin: Boolean = true
 	
 	val reader: BufferedReader = BufferedReader(InputStreamReader(socket.getInputStream()))
 	val writer: PrintWriter = PrintWriter(socket.getOutputStream(), true)
@@ -18,6 +18,11 @@ class COClient(val name: String, val socket: Socket, val coServer: COServer) {
 		try {
 			while (socket.isConnected) {
 				val message = Message.createMessageFromText(reader.readLine())
+				
+				if (message.text.isEmpty())
+					continue
+				
+				println("$name: $message")
 				
 				if (message.messageType == MessageType.Message)
 					coServer.broadcast(message.apply { message.text = "$name: ${message.text}" })
@@ -41,7 +46,7 @@ class COClient(val name: String, val socket: Socket, val coServer: COServer) {
 	
 	fun disconnect(reason: String?) {
 		if (reason != null)
-			sendMessage(Message(reason, MessageType.Kick))
+			sendMessage(Message(reason.ifEmpty { "No reason" }, MessageType.Kick))
 		
 		socket.close()
 		reader.close()
