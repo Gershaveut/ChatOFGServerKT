@@ -1,11 +1,24 @@
 package com.gershaveut.coserverkt
 
-suspend fun main() {
-    try {
-        println("Enter port")
-        
-        COServer(readln().toInt()).start()
-    } catch (_: Exception) {
-        main()
-    }
+import com.gershaveut.coserverkt.command.CommandAdmin
+import com.gershaveut.ock.console.CommandHandler
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+
+suspend fun main() = coroutineScope {
+	println("Enter port")
+	
+	val coServer = COServer(readln().toInt())
+	
+	launch {
+		coServer.start()
+	}
+	
+	val commandHandler = CommandHandler()
+	
+	commandHandler.commands.add(CommandAdmin(coServer))
+	
+	while (true) {
+		println(commandHandler.executeCommand(readln()))
+	}
 }

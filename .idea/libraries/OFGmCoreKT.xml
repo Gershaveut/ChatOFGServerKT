@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="OFGmCoreKT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/OFGmCoreKT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -9,7 +9,7 @@ import java.io.PrintWriter
 import java.net.Socket
 
 class COClient(val name: String, val socket: Socket, val coServer: COServer) {
-	var admin: Boolean = true
+	var admin: Boolean = false
 	
 	val reader: BufferedReader = BufferedReader(InputStreamReader(socket.getInputStream()))
 	val writer: PrintWriter = PrintWriter(socket.getOutputStream(), true)

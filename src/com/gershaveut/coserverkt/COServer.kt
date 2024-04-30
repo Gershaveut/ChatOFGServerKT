@@ -64,6 +64,15 @@ class COServer(port: Int) {
         }
     }
 	
+	fun admin(name: String, admin: Boolean) {
+		clients.forEach {
+			if (name == it.name)
+				it.admin = admin
+		}
+		
+		broadcast(Message(if (admin) "$name became an administrator" else "$name stopped being an administrator", MessageType.Broadcast))
+	}
+	
 	fun executeCommand(message: Message) : Message? {
 		when (message.messageType) {
 			MessageType.Kick -> {
