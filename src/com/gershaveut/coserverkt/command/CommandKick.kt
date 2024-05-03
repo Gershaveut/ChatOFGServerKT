@@ -5,18 +5,16 @@ import com.gershaveut.ock.console.AbstractCommand
 import com.gershaveut.ock.console.NeedArgument
 import com.gershaveut.ock.tryGet
 
-class CommandAdmin(private val coServer: COServer) : AbstractCommand("admin", "Assigns administrator status to the user.",
+class CommandKick(private val coServer: COServer) : AbstractCommand("kick", "Kicks a user from the server.",
 	NeedArgument("name<string>", "User name"),
-	NeedArgument("admin<bool> = true", "Admin State"))
+	NeedArgument("cause<string>", "Reason for exclusion"))
 {
 	override val needArgument = 1
 	
 	override fun execute(arguments: List<String>?): String? {
-		val userName = arguments!![0]
-		val admin = arguments.tryGet(1)?.toBoolean()
+		val name = arguments!![0]
+		val reason = arguments.tryGet(1)
 		
-		coServer.admin(userName, admin ?: true)
-		
-		return null
+		return coServer.kick(name, reason)?.text
 	}
 }

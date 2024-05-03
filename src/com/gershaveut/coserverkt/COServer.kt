@@ -2,6 +2,7 @@ package com.gershaveut.coserverkt
 
 import com.gershaveut.coapikt.Message
 import com.gershaveut.coapikt.MessageType
+import com.gershaveut.ock.detailedException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
@@ -75,25 +76,28 @@ class COServer(port: Int) {
 	
 	fun executeCommand(message: Message) : Message? {
 		when (message.messageType) {
-			MessageType.Kick -> {
-				val client: COClient
-				val reason = message.arguments!!
-				
-				try {
-					client = clients.first { it.name == message.text }
-				} catch (_: Exception) {
-					return Message("User not found", MessageType.Error)
-				}
-				
-				client.disconnect(reason)
-				
-				if (reason.isEmpty())
-					println("${client.name} excluded without a reason")
-				else
-					println("${client.name} excluded due to $reason")
-			}
+			MessageType.Kick -> return kick(message.text, message.arguments!!)
 			else -> broadcast(message)
 		}
+		
+		return null
+	}
+	
+	fun kick(name: String, reason: String?): Message? {
+		val client: COClient
+		
+		try {
+			client = clients.first { it.name == name }
+		} catch (_: Exception) {
+			return Message("User not found", MessageType.Error)
+		}
+		
+		client.disconnect(reason)
+		
+		if (reason.isNullOrEmpty())
+			println("${client.name} excluded without a reason")
+		else
+			println("${client.name} excluded due to $reason")
 		
 		return null
 	}

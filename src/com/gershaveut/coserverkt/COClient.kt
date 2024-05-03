@@ -22,14 +22,16 @@ class COClient(val name: String, val socket: Socket, val coServer: COServer) {
 				if (message.text.isEmpty())
 					continue
 				
-				println("$name: $message")
-				
-				if (message.messageType == MessageType.Message)
+				if (message.messageType == MessageType.Message) {
 					coServer.broadcast(message.apply { message.text = "$name: ${message.text}" })
-				else if (admin)
+					println("$name: ${message.text}")
+				} else if (admin) {
 					coServer.executeCommand(message)?.let { sendMessage(it) }
-				else
+					println("$name: $message")
+				} else {
 					sendMessage(Message("You do not have sufficient rights to use this", MessageType.Error))
+					println("$name tried to execute $message")
+				}
 			}
 		} catch (_: Exception) {
 			disconnect("There was an error in your connection")
