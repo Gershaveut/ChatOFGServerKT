@@ -24,7 +24,7 @@ class COClient(val name: String, val socket: Socket, val coServer: COServer) {
 				
 				if (message.messageType == MessageType.Message) {
 					coServer.broadcast(message.apply { message.text = "$name: ${message.text}" })
-					println("$name: ${message.text}")
+					println(message.text)
 				} else if (admin) {
 					coServer.executeCommand(message)?.let { sendMessage(it) }
 					println("$name: $message")

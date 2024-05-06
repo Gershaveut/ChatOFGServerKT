@@ -6,8 +6,8 @@ import com.gershaveut.ock.console.NeedArgument
 import com.gershaveut.ock.tryGet
 
 class CommandKick(private val coServer: COServer) : AbstractCommand("kick", "Kicks a user from the server.",
-	NeedArgument("name<string>", "User name"),
-	NeedArgument("cause<string>", "Reason for exclusion"))
+	NeedArgument("name", "User name"),
+	NeedArgument("cause?", "Reason for exclusion"))
 {
 	override val needArgument = 1
 	

@@ -6,7 +6,7 @@ import com.gershaveut.ock.console.NeedArgument
 import com.gershaveut.ock.tryGet
 
 class CommandAdmin(private val coServer: COServer) : AbstractCommand("admin", "Assigns administrator status to the user.",
-	NeedArgument("name<string>", "User name"),
+	NeedArgument("name", "User name"),
 	NeedArgument("admin<bool> = true", "Admin State"))
 {
 	override val needArgument = 1
