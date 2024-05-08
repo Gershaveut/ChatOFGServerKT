@@ -27,6 +27,9 @@ class COServer(port: Int) {
 				val clientSocket = serverSocket.accept()
                 val client = COClient(BufferedReader(InputStreamReader(clientSocket.getInputStream())).readLine(), clientSocket, this@COServer)
 				
+				if (client.name.isEmpty())
+					client.disconnect("The name cannot be empty")
+				
 				if (clients.any { it.name == client.name })
 					client.disconnect("User ${client.name} is already joined")
 				
