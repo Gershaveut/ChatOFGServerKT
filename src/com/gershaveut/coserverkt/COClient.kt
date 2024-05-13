@@ -2,7 +2,7 @@ package com.gershaveut.coserverkt
 
 import com.gershaveut.coapikt.Message
 import com.gershaveut.coapikt.MessageType
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -11,8 +11,10 @@ import java.net.Socket
 class COClient(val name: String, val socket: Socket, val coServer: COServer) {
 	var admin: Boolean = false
 	
-	val reader: BufferedReader = BufferedReader(InputStreamReader(socket.getInputStream()))
-	val writer: PrintWriter = PrintWriter(socket.getOutputStream(), true)
+	private val reader: BufferedReader = BufferedReader(InputStreamReader(socket.getInputStream()))
+	private val writer: PrintWriter = PrintWriter(socket.getOutputStream(), true)
+	
+	lateinit var receiveMessageJob: Job
 	
 	suspend fun receiveMessage() = coroutineScope {
 		try {
@@ -34,36 +36,41 @@ class COClient(val name: String, val socket: Socket, val coServer: COServer) {
 				}
 			}
 		} catch (_: Exception) {
-			disconnect("There was an error in your connection")
-			
-			return@coroutineScope
+		} finally {
+			if (isActive)
+				disconnect()
 		}
-		
-		disconnect()
 	}
 	
 	fun sendMessage(message: Message) {
 		writer.println(message)
 	}
 	
-	fun disconnect(reason: String?) {
-		if (reason != null)
+	fun silentDisconnect(reason: String? = null) {
+		if (reason != null) {
 			sendMessage(Message(reason.ifEmpty { "No reason" }, MessageType.Kick))
+			println("$name excluded due to $reason")
+		}
 		
 		socket.close()
 		reader.close()
 		writer.close()
 		
-		coServer.clients.forEach {
-			coServer.broadcast(Message(it.name, MessageType.Leave))
-		}
-		
-		coServer.broadcast(Message("$name connected"))
-		
 		coServer.clients.remove(this)
+		
+		println("$name disconnect")
 	}
 	
-	fun disconnect() {
-		disconnect(null)
+	fun disconnect(reason: String? = null) {
+		silentDisconnect(reason)
+		
+		coServer.broadcast(Message(name, MessageType.Leave))
+		coServer.broadcast(Message("$name disconnect"))
+	}
+	
+	fun kick(reason: String? = null) {
+		receiveMessageJob.cancel()
+		
+		disconnect(reason)
 	}
 }

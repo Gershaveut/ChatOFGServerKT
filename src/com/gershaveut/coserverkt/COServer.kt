@@ -31,7 +31,7 @@ class COServer(port: Int) {
 					client.disconnect("The name cannot be empty")
 				
 				if (clients.any { it.name == client.name })
-					client.disconnect("User ${client.name} is already joined")
+					client.silentDisconnect("User ${client.name} is already joined")
 				
 				//Registering
 				clients.forEach {
@@ -43,8 +43,10 @@ class COServer(port: Int) {
 				broadcast(Message(client.name, MessageType.Join))
 				broadcast(Message("${client.name} connected"))
 				
-				launch {
-                    client.receiveMessage()
+				println("${client.name} connected")
+				
+				client.receiveMessageJob = launch {
+					client.receiveMessage()
 				}
 			} catch (e: Exception) {
 				println(detailedException(e))
@@ -61,20 +63,19 @@ class COServer(port: Int) {
     
     fun broadcast(message: Message) {
         clients.forEach {
-			if (message.messageType == MessageType.Message)
-            	it.sendMessage(Message(message.text))
-			else
-				it.sendMessage(message)
+			it.sendMessage(message)
         }
     }
 	
 	fun admin(name: String, admin: Boolean) {
 		clients.forEach {
-			if (name == it.name)
+			if (name == it.name) {
 				it.admin = admin
+				broadcast(Message(if (admin) "$name became an administrator" else "$name stopped being an administrator", MessageType.Broadcast))
+				
+				return@forEach
+			}
 		}
-		
-		broadcast(Message(if (admin) "$name became an administrator" else "$name stopped being an administrator", MessageType.Broadcast))
 	}
 	
 	fun executeCommand(message: Message) : Message? {
@@ -95,12 +96,7 @@ class COServer(port: Int) {
 			return Message("User not found", MessageType.Error)
 		}
 		
-		client.disconnect(reason)
-		
-		if (reason.isNullOrEmpty())
-			println("${client.name} excluded without a reason")
-		else
-			println("${client.name} excluded due to $reason")
+		client.kick(reason)
 		
 		return null
 	}
