@@ -80,7 +80,7 @@ class COServer(port: Int) {
 	
 	fun executeCommand(message: Message) : Message? {
 		when (message.messageType) {
-			MessageType.Kick -> return kick(message.text, message.arguments!!)
+			MessageType.Kick -> return kick(message.text, message.argument!!)
 			else -> broadcast(message)
 		}
 		

@@ -19,7 +19,7 @@ class COClient(val name: String, val socket: Socket, val coServer: COServer) {
 	suspend fun receiveMessage() = coroutineScope {
 		try {
 			while (socket.isConnected) {
-				val message = Message.createMessageFromText(reader.readLine())
+				val message = Message.parseMessage(reader.readLine())
 				
 				if (message.text.isEmpty())
 					continue
