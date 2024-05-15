@@ -9,17 +9,17 @@ import com.gershaveut.ock.tryGet
 
 class CommandSend(private val coServer: COServer) : AbstractCommand("send", "Send custom message to user.",
 	NeedArgument("text", "Message text"),
-	NeedArgument("type<MessageType>", "Message type<${MessageType.entries.toTypedArray().joinToString()}>"),
+	NeedArgument("type<MessageType>", "Message type<Custom, ${MessageType.entries.toTypedArray().joinToString()}>"),
 	NeedArgument("user?", "Shipping destination"))
 {
 	override val needArgument = 2
 	
 	override fun execute(arguments: List<String>?): String? {
 		val text = arguments!![0]
-		val type = MessageType.valueOf(arguments[1])
+		val type = if (arguments[1] != "Custom") MessageType.valueOf(arguments[1]) else null
 		val user = arguments.tryGet(2)
 		
-		val message = Message(text, type)
+		val message = if (type != null) Message(text, type) else Message.parseMessage(text)
 		
 		if (user != null)
 			coServer.sendMessage(user, message)
