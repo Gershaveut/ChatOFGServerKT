@@ -5,10 +5,10 @@ import com.gershaveut.coapikt.MessageType
 import com.gershaveut.ock.detailedException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.awt.Color
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.ServerSocket
-import java.net.SocketAddress
 import java.util.HashSet
 
 class COServer(port: Int) {
@@ -71,7 +71,7 @@ class COServer(port: Int) {
 		clients.forEach {
 			if (name == it.name) {
 				it.admin = admin
-				broadcast(Message(if (admin) "$name became an administrator" else "$name stopped being an administrator", MessageType.Broadcast))
+				broadcast(Message(if (admin) "$name became an administrator" else "$name stopped being an administrator", MessageType.Broadcast).apply { color = Color.RED.rgb })
 				
 				return@forEach
 			}
@@ -81,7 +81,7 @@ class COServer(port: Int) {
 	fun executeCommand(message: Message) : Message? {
 		when (message.messageType) {
 			MessageType.Kick -> return kick(message.text, message.argument!!)
-			else -> broadcast(message)
+			else -> broadcast(message.apply { color = Color.YELLOW.rgb })
 		}
 		
 		return null
