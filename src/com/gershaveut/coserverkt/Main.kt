@@ -41,7 +41,7 @@ suspend fun main() = coroutineScope {
 				when (e.keyCode) {
 					NativeKeyEvent.VC_UP -> historyCommand = commandHandler.getNext()
 					NativeKeyEvent.VC_DOWN -> historyCommand = commandHandler.getPrevious()
-					NativeKeyEvent.VC_RIGHT -> historyCommand?.let {
+					NativeKeyEvent.VC_F12-> historyCommand?.let {
 						println(it)
 						println(commandHandler.executeCommand(it))
 					}
